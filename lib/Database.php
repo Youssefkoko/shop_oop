@@ -1,5 +1,5 @@
 <?php
-
+require_once '../config/config.php';
 /**
  * DB PDO CLASS 
  * Connect to db 
