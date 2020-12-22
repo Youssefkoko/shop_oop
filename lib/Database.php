@@ -1,92 +1,93 @@
 <?php
 require_once '../config/config.php';
-/**
- * DB PDO CLASS 
- * Connect to db 
- * Create prepare stmt
- * Bind Values
- * return rows
- * 
- **/
-class Database
-{
-  private $host = DB_HOST;
-  private $user = DB_USER;
-  private $pass = DB_PASS;
-  private $dbname = DB_NAME;
+ class Database {
 
-  private $dbh;
-  private $stmt;
-  private $error;
+  public $host = DB_HOST;
+  public $user = DB_USER;
+  public $pass = DB_PASS;
+  public $dbname = DB_NAME;
 
-  public function __construct()
-  {
-    // Set DSN
-    $dsn = 'mysql:host=' . $this->host . ';dbname=' . $this->dbname;
-    $options = array(
-      PDO::ATTR_PERSISTENT => true,
-      PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-    );
-    // Create PDO instance
-    try {
-      $this->dbh = new PDO($dsn, $this->user, $this->pass, $options);
-    } catch (PDOException $e) {
-      $this->error = $e->getMessage();
-      echo $this->error;
-    }
+  public $link;
+  public $error;
+
+
+  public function __construct(){
+  $this->connectDB();
   }
 
-  // Prepare statement with query
-  public function query($sql)
-  {
-    $this->stmt = $this->dbh->prepare($sql);
-  }
 
-  // Bind values
-  public function bind($param, $value, $type = null)
-  {
-    if (is_null($type)) {
-      switch (true) {
-        case is_int($value):
-          $type = PDO::PARAM_INT;
-          break;
-        case is_bool($value):
-          $type = PDO::PARAM_BOOL;
-          break;
-        case is_null($value):
-          $type = PDO::PARAM_NULL;
-          break;
-        default:
-          $type = PDO::PARAM_STR;
+
+
+  private function connectDB(){
+
+    $this->link = new mysqli($this->host,$this->user, $this->pass, $this->dbname);
+
+      if(!$this->link) {
+      
+      $this->error ="connection fail".$this->link->connect_error;
+        return false;
       }
+  }
+    // Select or Read Data From Database 
+   
+  public function select($query){
+    $result = $this->link->query($query) or die ($this->link->error.__LINE__);
+    if($result->num_rows > 0){
+      return $result;
+    } else {
+          return false;
+      }   
+
+  }
+
+   // Create Data in to the database 
+
+  public function insert($query){
+    $insert_row = $this->link->query($query) or die ($this->link->error.__LINE__);
+    if($insert_row){
+     return $insert_row;
+      exit();
+    } else {
+      return false;
+
     }
 
-    $this->stmt->bindValue($param, $value, $type);
   }
 
-  // Execute the prepared statement
-  public function execute()
-  {
-    return $this->stmt->execute();
+   /// Update Data in to the database
+
+  public function update($query){
+   $update_row = $this->link->query($query) or die ($this->link->error.__LINE__);
+    if($update_row){
+   	return $update_row;
+    exit();
+    } else {
+        return false;
+    }
+
   }
 
-  // Get result set as array of objects
-  public function resultSet()
-  {
-    $this->execute();
-    return $this->stmt->fetchAll(PDO::FETCH_OBJ);
-  }
 
-  // Get single record as object
-  public function single()
-  {
-    $this->execute();
-    return $this->stmt->fetch(PDO::FETCH_OBJ);
-  }
 
-  // Get row count
-  public function rowCount()
-  {
-    return $this->stmt->rowCount();
-  }
+
+/// Delete Data in to the database
+
+  public function delete($query){
+   $delete_row = $this->link->query($query) or die ($this->link->error.__LINE__);
+    if($delete_row){
+   	return $delete_row;
+   	exit();
+    } else {
+    return false;
+
+    }
+
+   }
+
+
+
+
 }
+
+
+?>

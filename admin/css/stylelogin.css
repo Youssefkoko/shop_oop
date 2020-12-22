@@ -257,3 +257,9 @@ form:after {
 	background-position: 0 -135px;
 	color: #00aeef;
 }
+.err { 
+	font-size: 18px;
+	color: rgb(156, 0, 0);
+	margin-bottom: 1.2em;
+	
+}
